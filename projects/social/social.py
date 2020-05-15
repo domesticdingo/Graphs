@@ -1,3 +1,7 @@
+from random import randrange, shuffle
+import math
+from util import Queue
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -45,8 +49,22 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        for n in range(num_users):
+            self.add_user(n)
 
         # Create friendships
+        total_friends = 0
+        max_friends = num_users * avg_friendships
+
+        while total_friends < max_friends:
+            user = randrange(1, num_users + 1)
+            friend = randrange(1, num_users + 1)
+
+            #Update friend until a unique friend is found
+            while user == friend or friend in self.friendships[user]:
+                friend = randrange(1, num_users + 1)
+            self.add_friendship(user, friend)
+            total_friends += 2
 
     def get_all_social_paths(self, user_id):
         """
@@ -58,7 +76,19 @@ class SocialGraph:
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        q = Queue()
+        q.enqueue({'id': user_id, 'path': [user_id]})
+
+        while q.size() > 0:
+            user = q.dequeue()
+            visited[user['id']] = user['path']
+
+            for friend in self.friendships[user['id']]:
+                if friend not in visited:
+                    visited[friend] = user['path'] + [friend]
+                    q.enqueue({'id': friend, 'path': visited[friend]})
+
+
         return visited
 
 
